@@ -1,0 +1,6 @@
+#ifndef CONFIG_HEADER
+#define CONFIG_HEADER
+
+#define CLOCK_FREQ 16000000U
+
+#endif
