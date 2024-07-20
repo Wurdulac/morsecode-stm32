@@ -19,7 +19,9 @@
 
 struct usart_read_buffer{
     volatile uint8_t *buffer;
+    volatile uint32_t write_index;
     uint32_t read_index;
+    volatile uint32_t symbols_to_read;
     uint32_t size;
 } typedef usart_read_buffer;
 
@@ -29,4 +31,5 @@ struct usart{
 
 void usart_config(usart *usart_p, uint32_t baudrate);
 void usart_receive_interrupt(usart *usart_p, uint8_t *buffer, uint32_t buffer_size);
+uint8_t usart_read_from_buffer(usart *usart_p);
 #endif

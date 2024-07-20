@@ -3,6 +3,9 @@
 #include <rcc.h>
 #include <usart.h>
 #include <fpu.h>
+#include <systick.h>
+#include <config.h>
+#include <morse.h>
 
 extern uint8_t _sbss, _ebss, _sdata, _edata, _lmadata;
 extern void _stack(void);
@@ -22,6 +25,7 @@ __attribute__((weak)) void USART2_IRQHandler(void){while(1){}}
 char recv_buffer[1000];
 
 void System_Init(){
+  systick_config(CLOCK_FREQ);
   fpu_enable();
   rcc_enable_clock(AHB1, RCC_GPIOA);
   rcc_enable_clock(APB1, RCC_USART2);
@@ -31,11 +35,10 @@ void System_Init(){
 
 int main(void) {
   System_Init();
-  usart *usart2 = USART2_ADDRESS;
-
   usart_receive_interrupt(USART2_ADDRESS, recv_buffer, 1000);
-  gpio_write_pin(GPIO_GPIOA, 5, GPIO_SET);
-  while (1){} 
+  while (1){
+    morse_send(usart_read_from_buffer(USART2_ADDRESS));
+  }
   return 0; 
 }
 

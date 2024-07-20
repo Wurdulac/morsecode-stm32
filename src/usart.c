@@ -34,16 +34,30 @@ void usart_receive_interrupt(usart *usart_p, uint8_t *buffer, uint32_t buffer_si
     if (usart_p == USART2_ADDRESS)
     {
         usart2_read_buffer.buffer = buffer;
+        usart2_read_buffer.write_index = 0;
         usart2_read_buffer.read_index = 0;
+        usart2_read_buffer.symbols_to_read = 0;
         usart2_read_buffer.size = buffer_size;
     }    
+}
+uint8_t usart_read_from_buffer(usart *usart_p){
+    uint8_t result = '\0';
+    if (usart_p == USART2_ADDRESS)
+    {   
+        while (usart2_read_buffer.symbols_to_read == 0){}        
+        result = usart2_read_buffer.buffer[usart2_read_buffer.read_index];
+        usart2_read_buffer.read_index = (usart2_read_buffer.read_index + 1) % usart2_read_buffer.size;
+        usart2_read_buffer.symbols_to_read--;
+    }
+    return result;
 }
 // Interrupt Service Routines
 void USART2_IRQHandler(void){
     usart *usart2 = USART2_ADDRESS;
     if (usart2->SR & USART_SR_RXNE)
     {
-        usart2_read_buffer.buffer[usart2_read_buffer.read_index] = usart2->DR;
-        usart2_read_buffer.read_index = (usart2_read_buffer.read_index + 1) % usart2_read_buffer.size;
+        usart2_read_buffer.buffer[usart2_read_buffer.write_index] = usart2->DR;
+        usart2_read_buffer.write_index = (usart2_read_buffer.write_index + 1) % usart2_read_buffer.size;
+        usart2_read_buffer.symbols_to_read = (usart2_read_buffer.symbols_to_read < usart2_read_buffer.size) ? usart2_read_buffer.symbols_to_read + 1 : usart2_read_buffer.size;
     }    
 }

@@ -10,7 +10,7 @@ OBJCOPYFLAGS = -O binary
 
 
 #source files here
-SRC = main.c gpio.c rcc.c nvic.c usart.c fpu.c
+SRC = main.c gpio.c rcc.c nvic.c usart.c fpu.c systick.c morse.c
 SRC_ADJUSTED := $(foreach wrd,$(SRC), src/$(wrd))
 INCLUDE := include/*
 
